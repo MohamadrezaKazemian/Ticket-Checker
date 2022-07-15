@@ -22,7 +22,7 @@ const index = () => {
         await axios.post('https://bus.atighgasht.com/BusService/api/GetServices', {
             "From": 11320000,
             "To": 54360000,
-            "Date": "2022-07-06",
+            "Date": "2022-07-15",
             "Count": 1,
             "IncludeClosed": true,
             "IncludePromotions": true,
@@ -63,7 +63,6 @@ const index = () => {
     //دریافت اطلاعات بلیط های دو روز
     function twoDay() {
         getData()
-        getDataToNight()
     }
     //تنظیم کردن دریافت اطلاعات هر 10 ثانیه یک بار
     useEffect(() => {
