@@ -68,7 +68,7 @@ const index = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             twoDay()
-        }, 10000);
+        }, 50000);
 
         return () => clearInterval(interval);
     }, []);
@@ -78,7 +78,7 @@ const index = () => {
         <div className={style.ticket}>
             <div>
                 {
-                    allTickets.length> 0?allTickets.map((item , index)=>{
+                    data.length> 0?data.map((item , index)=>{
                         return(
                             <div style={{background : item.Capacity === 0 ? "#a82e2e" : "#4b8869"}} key={index}>
                                 <span>{item.Capacity}  صندلی خالی </span>
