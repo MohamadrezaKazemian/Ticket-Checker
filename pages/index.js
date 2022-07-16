@@ -22,7 +22,7 @@ const index = () => {
         await axios.post('https://bus.atighgasht.com/BusService/api/GetServices', {
             "From": 11320000,
             "To": 54360000,
-            "Date": "2022-07-15",
+            "Date": "2022-07-16",
             "Count": 1,
             "IncludeClosed": true,
             "IncludePromotions": true,
