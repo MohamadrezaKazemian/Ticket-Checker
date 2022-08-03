@@ -4,24 +4,25 @@ import React from 'react'
 import axios from 'axios';
 import {Howl, Howler} from 'howler';
 const index = () => {
+    const inputEl = useRef(null);
+
     const sound = new Howl({
         src : ["son.mp3" , "son.mp3"]
     });
-
     const [loading, setLoading] = useState(true)
     const [data, setData] = useState([])
     const [dataToNigtht, setDataToNigtht] = useState([])
+
     const [allTickets, setAllTickets] = useState([])
     dataToNigtht.map((item , index)=>{
         item?.Capacity < 1 ? sound.play() : ""
     })
 
-    const ref = useRef()
-
     //اگر چند روز را داشته باشیم باید تمام بلیط ها را در یک آرایه بریزیم. مثال :
     if (loading === false) {
         setAllTickets([...data, ...dataToNigtht])
         setLoading(true)
+        inputEl.current.click();
     }
 
 
@@ -62,7 +63,7 @@ const index = () => {
             .then(res => {
                 setDataToNigtht(res?.data?.Buses)
                 setLoading(false)
-                ref.current.click()
+                inputEl.current.click();
 
             })
             .catch(err => {
@@ -85,15 +86,15 @@ const index = () => {
 
 
     return (
-        <div className={style.ticket}>
+        <div className={style.ticket} ref={inputEl}>
             <div>
 
                 {
                     dataToNigtht.length > 1 ? dataToNigtht.map((item, index) => {
 
                         return (
-                            <div ref={ref} style={{background: item.Capacity === 0 ? "#a82e2e" : "#4b8869"}} key={index}>
-                                <span>{item.Capacity} صندلی خالی </span>
+                            <div  style={{background: item.Capacity === 0 ? "#a82e2e" : "#4b8869"}} key={index}>
+                                <span ref={inputEl}>{item.Capacity} صندلی خالی </span>
                                 <span>روز {item?.Weekday}</span>
                                 <span>{item?.DepartureTime.substring(11, 16)} ساعت </span>
                             </div>
