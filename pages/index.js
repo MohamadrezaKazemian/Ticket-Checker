@@ -1,86 +1,115 @@
+import {useState, useRef, useEffect} from "react";
 import style from "../style/index.module.scss"
-import React, { useState } from "react";
+import React from 'react'
 import axios from 'axios';
-import { DatePicker      } from "jalali-react-datepicker";
-
-
+import {Howl, Howler} from 'howler';
 const index = () => {
-    const [loading , setLoading] = useState()
-    const [data , setData] = useState([])
-    const [selectedDay , setSelectedDay] = useState("")
-    console.log(selectedDay)
-    function submitExample({ value }) {
-        setSelectedDay(value._i.slice(0, -3))
+    let path = "../pages/son.mp3"
+    const sound = new Howl({
+        src : ["son.mp3"]
+    });
+    Howler.volume(1);
+    // sound.play()
+    // sound.stop()
 
+
+
+    const [loading, setLoading] = useState(true)
+    const [data, setData] = useState([])
+    const [dataToNigtht, setDataToNigtht] = useState([])
+    const [allTickets, setAllTickets] = useState([])
+    dataToNigtht.map((item , index)=>{
+        item.Capacity < 1 ? sound.play() : sound.stop()
+    })
+
+    //اگر چند روز را داشته باشیم باید تمام بلیط ها را در یک آرایه بریزیم. مثال :
+    if (loading === false) {
+        setAllTickets([...data, ...dataToNigtht])
+        setLoading(true)
     }
 
 
-
+    //درخواست اطلاعات به سمت سرور
     const getData = async () => {
-        if (selectedDay === ""){
-            alert("لطفا یک تاریخ را انتخاب نمایید")
-        }else{
-            setLoading(true)
-
-            await axios.post('https://bus.atighgasht.com/BusService/api/GetServices', {
-                "From": 11320000,
-                "To": 54360000,
-                "Date": selectedDay,
-                "Count": 1,
-                "IncludeClosed": true,
-                "IncludePromotions": true,
-                "LoadFromDbOnUnavailability": true,
-                "IncludeUnderDevelopment": true,
-                "ExcludeProviderIds": [6]
+        setLoading(true)
+        await axios.post('https://bus.atighgasht.com/BusService/api/GetServices', {
+            "From": 11320000,
+            "To": 54360000,
+            "Date": "2022-08-04",
+            "Count": 1,
+            "IncludeClosed": true,
+            "IncludePromotions": true,
+            "LoadFromDbOnUnavailability": true,
+            "IncludeUnderDevelopment": true,
+            "ExcludeProviderIds": [6]
+        })
+            .then(res => {
+                setData(res?.data?.Buses)
             })
-                .then(res => {
-                    setData( res?.data?.Buses)
-                    setLoading(false)
-                })
-                .catch(err => {
-                    console.log(err)
+            .catch(err => {
+                console.log(err)
 
-                })
-        }
+            })
+    }
+    const getDataToNight = async () => {
+        await axios.post('https://bus.atighgasht.com/BusService/api/GetServices', {
+            "From": 54360000,
+            "To": 11320000,
+            "Date": "2022-08-08",
+            "Count": 1,
+            "IncludeClosed": true,
+            "IncludePromotions": true,
+            "LoadFromDbOnUnavailability": true,
+            "IncludeUnderDevelopment": true,
+            "ExcludeProviderIds": [6]
+        })
+            .then(res => {
+                setDataToNigtht(res?.data?.Buses)
+                setLoading(false)
+            })
+            .catch(err => {
+                console.log(err)
+
+            })
     }
 
+    //دریافت اطلاعات بلیط های دو روز
+    function twoDay() {
+        // getData()
+        getDataToNight()
 
+    }
 
     //تنظیم کردن دریافت اطلاعات هر 10 ثانیه یک بار
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         twoDay()
-    //     }, 10000);
+    useEffect(() => {
+        twoDay()
 
-    //     return () => clearInterval(interval);
-    // }, []);
+    }, []);
 
 
     return (
         <div className={style.ticket}>
-            <div className={style.theForm}>
-                <div>
-                    <span>تاریخ حرکت</span>
-                    <DatePicker
-                        timePicker={false}
-                        onClickSubmitButton={submitExample}
-                    />
-                </div>
-                <button onClick={()=>getData()}>ثبت درخواست</button>
+            <div>
 
-            </div>
-            <div className={style.results}>
                 {
-                 loading === true ? <p className={style.loading}>درحال بارگزاری...</p> :
-                     data.length> 0?data.map((item , index)=>{
-                         return(
-                             <div style={{background : item.Capacity === 0 ? "#a82e2e" : "#4b8869"}} key={index}>
-                                 <span>{item.Capacity}  صندلی خالی </span>
-                                 <span>روز {item?.Weekday}</span>
-                                 <span>{item?.DepartureTime.substring(11 , 16)} ساعت </span>
-                             </div>
-                         )
-                     }):""
+                    dataToNigtht.length > 1 ? dataToNigtht.map((item, index) => {
+
+                        return (
+                            <div style={{background: item.Capacity === 0 ? "#a82e2e" : "#4b8869"}} key={index}>
+                                <span>{item.Capacity} صندلی خالی </span>
+                                <span>روز {item?.Weekday}</span>
+                                <span>{item?.DepartureTime.substring(11, 16)} ساعت </span>
+                            </div>
+                        )
+                    }) : <div style={{
+                        background: `red`,
+                        position: `absolute`,
+                        right: `0`,
+                        left: `0`,
+                        top: `50%`,
+                        display: `flex`,
+                        justifyContent : `center`
+                    }}><span>درحال بارگزاری. . .</span></div>
 
                 }
             </div>
