@@ -86,7 +86,7 @@ const index = () => {
         const interval = setInterval(() => {
 
             twoDay()
-        }, 30000);
+        }, 50000);
 
         return () => clearInterval(interval);
     }, []);
