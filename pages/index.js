@@ -15,7 +15,7 @@ const index = () => {
 
     const [allTickets, setAllTickets] = useState([])
     dataToNigtht.map((item , index)=>{
-        item?.Capacity < 1 ? sound.play() : ""
+        item?.Capacity > 1 ? sound.play() : ""
     })
 
     //اگر چند روز را داشته باشیم باید تمام بلیط ها را در یک آرایه بریزیم. مثال :
