@@ -3,18 +3,19 @@ import style from "../style/index.module.scss"
 import React from 'react'
 import axios from 'axios';
 import {Howl, Howler} from 'howler';
+
 const index = () => {
     const inputEl = useRef(null);
 
     const sound = new Howl({
-        src : ["son.mp3" , "son.mp3"]
+        src: ["son.mp3", "son.mp3"]
     });
     const [loading, setLoading] = useState(true)
     const [data, setData] = useState([])
     const [dataToNigtht, setDataToNigtht] = useState([])
-
+    const [date , setDate] = useState("2022-08-08")
     const [allTickets, setAllTickets] = useState([])
-    dataToNigtht.map((item , index)=>{
+    dataToNigtht.map((item, index) => {
         item?.Capacity > 1 ? sound.play() : ""
     })
 
@@ -22,7 +23,6 @@ const index = () => {
     if (loading === false) {
         setAllTickets([...data, ...dataToNigtht])
         setLoading(true)
-        inputEl.current.click();
     }
 
 
@@ -52,7 +52,7 @@ const index = () => {
         await axios.post('https://bus.atighgasht.com/BusService/api/GetServices', {
             "From": 54360000,
             "To": 11320000,
-            "Date": "2022-08-08",
+            "Date": date,
             "Count": 1,
             "IncludeClosed": true,
             "IncludePromotions": true,
@@ -63,7 +63,6 @@ const index = () => {
             .then(res => {
                 setDataToNigtht(res?.data?.Buses)
                 setLoading(false)
-                inputEl.current.click();
 
             })
             .catch(err => {
@@ -78,29 +77,36 @@ const index = () => {
         getDataToNight()
 
     }
+    function timer(){
+
+    }
 
     //تنظیم کردن دریافت اطلاعات هر 10 ثانیه یک بار
     useEffect(() => {
-        twoDay()
-
+        getDataToNight()
         const interval = setInterval(() => {
-
-            twoDay()
-        }, 50000);
+            getDataToNight()
+        }, 20000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [date]);
 
     return (
-        <div className={style.ticket} ref={inputEl}>
+        <div className={style.ticket} >
+            <div style={{display: `flex`, justifyContent: `center`, color: `black`, gap:`5px` , alignItems:`center`}}>
+                <sub>دقت کن که میلادی باشه مثل: 06-04-2022</sub>
+                {/*<button id={"theBtn"}  type={"submit"} >ثبت</button>*/}
+                <input type={"text"} onChange={(event => setTimeout(()=>setDate(event.target.value) , 10000) )}/>
+                <span>تاریخ رو وارد کن</span>
+            </div>
             <div>
 
                 {
                     dataToNigtht.length > 1 ? dataToNigtht.map((item, index) => {
 
                         return (
-                            <div  style={{background: item.Capacity === 0 ? "#a82e2e" : "#4b8869"}} key={index}>
-                                <span ref={inputEl}>{item.Capacity} صندلی خالی </span>
+                            <div style={{background: item.Capacity === 0 ? "#a82e2e" : "#4b8869"}} key={index}>
+                                <span >{item.Capacity} صندلی خالی </span>
                                 <span>روز {item?.Weekday}</span>
                                 <span>{item?.DepartureTime.substring(11, 16)} ساعت </span>
                             </div>
@@ -112,7 +118,7 @@ const index = () => {
                         left: `0`,
                         top: `50%`,
                         display: `flex`,
-                        justifyContent : `center`
+                        justifyContent: `center`
                     }}><span>درحال بارگزاری. . .</span></div>
 
                 }
